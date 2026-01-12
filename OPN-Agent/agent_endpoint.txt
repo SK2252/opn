@@ -1,0 +1,79 @@
+Endpoint URL: http://localhost:8000/run-advanced-workflow
+Method: POST
+Content-Type: application/json
+
+Description:
+This is the advanced workflow endpoint using multi-agent architecture. It allows the frontend to trigger the AI agent for document processing.
+
+Request Body JSON Schema:
+{
+  "request_id": "string",          // Unique identifier for the request
+  "excel_path": "string",          // Path to the input Excel file
+  "template_docx": "string",       // Path to the template DOCX file
+  "output_folder": "string",       // (Optional) Base output folder name, defaults to "output"
+  "use_ai": boolean,               // (Optional) Whether to use AI features, defaults to false
+  "user_instructions": "string"    // (Optional) Specific instructions for the AI
+}
+
+Example Request Payload:
+{
+  "request_id": "req_12345",
+  "excel_path": "data/input/data.xlsx",
+  "template_docx": "data/templates/template.docx",
+  "output_folder": "results/project_x",
+  "use_ai": true,
+  "user_instructions": "Ensure all dates are formatted as YYYY-MM-DD."
+}
+
+Example Response (AI Mode - Success):
+{
+  "request_id": "req_12345",
+  "status": "SUCCESS",
+  "analysis": {
+    "total_rows": 50,
+    "columns": ["Name", "Date", "Amount"],
+    "summary": "Data contains 50 records..."
+  },
+  "validation": {
+    "is_valid": true,
+    "warnings": [],
+    "total_records": 50,
+    "validated_records": 50
+  },
+  "processing": {
+    "status": "SUCCESS",
+    "output_folder": "results/project_x/merged",
+    "stats": {
+      "successful": 50,
+      "failed": 0,
+      "skipped": 0,
+      "duration_seconds": 12.5
+    }
+  },
+  "insights": "The processing was successful. All 50 records were processed without errors.",
+  "errors": []
+}
+
+Example Response (Standard Mode - Success):
+{
+  "request_id": "req_67890",
+  "status": "SUCCESS",
+  "output_folder": "results/project_y/merged",
+  "stats": {
+    "total_records": 100,
+    "successful": 98,
+    "failed": 2,
+    "skipped": 0,
+    "duration_seconds": 45.2,
+    "errors": ["Row 10: Missing value", "Row 55: Invalid date"]
+  },
+  "errors": ["Row 10: Missing value", "Row 55: Invalid date"],
+  "warnings": ["Row 5: duplicate ID"],
+  "duration_seconds": 45.2,
+  "validation_result": {
+    "is_valid": true,
+    "warnings": ["Row 5: duplicate ID"],
+    "total_records": 100,
+    "validated_records": 100
+  }
+}

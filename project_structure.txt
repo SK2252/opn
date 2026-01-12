@@ -1,0 +1,102 @@
+yak_tech/
+├── generate_tree.py
+├── project_structure.txt
+├── OPN-Agent/
+│   ├── .env
+│   ├── .env.example
+│   ├── .gitignore
+│   ├── agent_endpoint.txt
+│   ├── image.jpg
+│   ├── kernel_config.py
+│   ├── main.py
+│   ├── README.md
+│   ├── requirements.txt
+│   ├── workflow_router.py
+│   ├── AI_open_negotiation/
+│   │   ├── agents/
+│   │   │   ├── document_agent/
+│   │   │   │   ├── base_agent.py
+│   │   │   │   ├── generation_agents.py
+│   │   │   │   ├── orchestrator_agent.py
+│   │   │   │   ├── validation_agent.py
+│   │   │   │   ├── __init__.py
+│   │   ├── Data/
+│   │   │   ├── Input/
+│   │   │   │   ├── CEP W6 OPNNEG TEMPLATE.xlsx
+│   │   │   │   ├── Email.xlsx
+│   │   │   │   ├── OpenNeg_CEP_Template.docx
+│   │   ├── models/
+│   │   │   ├── result_models.py
+│   │   │   ├── task_models.py
+│   │   │   ├── __init__.py
+│   │   ├── orchestrators/
+│   │   │   ├── ai_orchestrator.py
+│   │   │   ├── __init__.py
+│   │   ├── plugins/
+│   │   │   ├── document_plugin.py
+│   │   │   ├── __init__.py
+│   │   ├── skills/
+│   │   │   ├── document_skill.py
+│   │   │   ├── email_skill.py
+│   │   ├── utils/
+│   │   │   ├── app.log
+│   │   │   ├── file_utils.py
+│   │   │   ├── formatters.py
+│   │   │   ├── logger.py
+│   │   │   ├── __init__.py
+├── orchestrator/
+├── repi/
+│   ├── .env
+│   ├── .env.example
+│   ├── .gitignore
+│   ├── README.md
+│   ├── REPOSITORY_SUMMARY.txt
+│   ├── requirements.txt
+│   ├── requirements_new.txt
+│   ├── test_output.txt
+│   ├── verify_llm_config.py
+│   ├── verify_new_prompts.py
+│   ├── verify_out.txt
+│   ├── verify_output_final.txt
+│   ├── app/
+│   │   ├── config.py
+│   │   ├── logger.py
+│   │   ├── main.py
+│   │   ├── schemas.py
+│   │   ├── api/
+│   │   │   ├── chat.py
+│   │   │   ├── ingest.py
+│   │   │   ├── retrieve.py
+│   │   ├── db/
+│   │   │   ├── database.py
+│   │   │   ├── mysql.py
+│   │   │   ├── qdrant.py
+│   │   ├── embeddings/
+│   │   │   ├── nomic_local.py
+│   │   ├── models/
+│   │   │   ├── agent.py
+│   │   │   ├── base.py
+│   │   │   ├── subagent.py
+│   │   │   ├── __init__.py
+│   │   ├── services/
+│   │   │   ├── agent_inquiry_service.py
+│   │   │   ├── conversation_service.py
+│   │   │   ├── document_agent_service.py
+│   │   │   ├── ingest_service.py
+│   │   │   ├── llm_service.py
+│   │   │   ├── query_validator_service.py
+│   │   │   ├── retrieval_service.py
+│   ├── logs/
+│   │   ├── rag_agent_router_20260110_132256.log
+│   │   ├── rag_agent_router_20260112_132255.log
+│   │   ├── rag_agent_router_20260112_132516.log
+│   │   ├── rag_agent_router_20260112_132604.log
+│   │   ├── rag_agent_router_20260112_133849.log
+│   │   ├── rag_agent_router_20260112_134304.log
+│   │   ├── rag_agent_router_20260112_134321.log
+│   │   ├── rag_agent_router_20260112_154333.log
+│   ├── user_logs/
+│   │  
+├── scripts/
+│   ├── register_opn_agent.py
+│   ├── test_conversation_flow.py

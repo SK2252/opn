@@ -1,0 +1,44 @@
+# AI Open Negotiation Automation System - Requirements
+
+# Core Framework
+fastapi>=0.100.0
+uvicorn>=0.22.0
+pydantic>=2.0.0
+
+# Semantic Kernel
+semantic-kernel>=1.0.0
+
+# Data Processing
+pandas>=2.0.0
+openpyxl>=3.1.0
+xlrd>=2.0.0
+
+# Document Processing
+python-docx>=1.0.0
+docx2pdf>=0.1.8
+
+# Windows COM (for Outlook integration)
+pywin32>=306
+
+# HTTP Client (for AI services)
+aiohttp>=3.8.0
+httpx>=0.24.0
+groq>=0.4.0
+
+# Environment Variables
+python-dotenv>=1.0.0
+
+# Logging & Utilities
+colorama>=0.4.6
+
+# Development & Testing
+pytest>=7.0.0
+pytest-asyncio>=0.21.0
+
+# Type Checking (optional)
+# mypy>=1.0.0
+# types-python-docx>=0.0.1
+
+# Linting (optional)
+# ruff>=0.0.280
+# black>=23.0.0
