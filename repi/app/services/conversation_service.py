@@ -715,7 +715,7 @@ def finalize_routing(session: ConversationSession, agent_name: str, subagent_nam
 def is_confirmation_response(query: str, session: ConversationSession) -> bool:
     """
     Check if user response is confirming a routing decision.
-    Uses session state + LLM detection for reliability.
+    Uses robust keyword matching first, then LLM for complex responses.
     """
     conversation_logger.debug(f"[CONFIRMATION CHECK] awaiting_confirmation={session.awaiting_confirmation}, query='{query}'")
     
@@ -723,7 +723,35 @@ def is_confirmation_response(query: str, session: ConversationSession) -> bool:
     if session.awaiting_confirmation:
         conversation_logger.info(f"[CONFIRMATION CHECK] System is awaiting confirmation. Checking if response is affirmative...")
         
-        # Use LLM to detect if current response is affirmative
+        # 1. Fast Keyword/Pattern Check (Prioritize this for speed and reliability)
+        cleaned_query = query.strip().lower()
+        # Remove common punctuation
+        cleaned_query = cleaned_query.rstrip(".,!?")
+        
+        affirmative_keywords = {
+            "yes", "yeah", "yep", "yup", "sure", "ok", "okay", "correct", "right", 
+            "agree", "proceed", "go", "continue", "do it", "make it", "generate", 
+            "start", "affirmative", "fine", "cool", "confirm"
+        }
+        
+        # Exact match
+        if cleaned_query in affirmative_keywords:
+            conversation_logger.info(f"[CONFIRMATION CHECK] matched keyword (exact): '{cleaned_query}'")
+            return True
+            
+        # Starts with match (e.g. "yes please", "sure thing")
+        first_word = cleaned_query.split(' ')[0]
+        if first_word in affirmative_keywords:
+             conversation_logger.info(f"[CONFIRMATION CHECK] matched keyword (start): '{first_word}'")
+             return True
+             
+        # substring check for specific phrases
+        strong_phrases = ["sounds good", "go ahead", "let's do it", "lets do it", "let's go"]
+        if any(phrase in cleaned_query for phrase in strong_phrases):
+             conversation_logger.info(f"[CONFIRMATION CHECK] matched phrase")
+             return True
+
+        # 2. Use LLM to detect complex affirmative responses
         affirmative_prompt = f"""Determine if this user response indicates agreement, confirmation, or approval.
 
 User Response: \"{query}\"
@@ -744,12 +772,8 @@ Answer:"""
             conversation_logger.info(f"[CONFIRMATION CHECK] LLM says affirmative={is_affirmative} for query='{query}'")
             return is_affirmative
         except Exception as e:
-            conversation_logger.warning(f"[CONFIRMATION CHECK] LLM error: {e}, using fallback")
-            # Fallback: check for affirmative keywords
-            affirmative_keywords = ["yes", "yeah", "yep", "correct", "right", "sure", "ok", "okay", "agree", "proceed", "go"]
-            is_affirmative = any(kw in query.lower() for kw in affirmative_keywords)
-            conversation_logger.info(f"[CONFIRMATION CHECK] Fallback says affirmative={is_affirmative}")
-            return is_affirmative
+            conversation_logger.warning(f"[CONFIRMATION CHECK] LLM error: {e}, defaulting to False")
+            return False
     
     conversation_logger.debug(f"[CONFIRMATION CHECK] Not awaiting confirmation, returning False")
     return False

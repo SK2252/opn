@@ -1,6 +1,7 @@
 """
 Core orchestrator logic.
 Coordinates between Repi (routing) and OPN-Agent (execution).
+# Config reload trigger
 """
 
 import json
@@ -235,9 +236,30 @@ class Orchestrator:
             )
             response.raise_for_status()
             
-            # Get JSON response and convert numpy/pandas types
-            result = response.json()
+            # Get response text first
+            response_text = response.text
+            
+            # Parse JSON manually to handle any serialization issues
+            try:
+                result = json.loads(response_text)
+            except json.JSONDecodeError as e:
+                # If JSON parsing fails, try to extract what we can
+                return {
+                    "status": "FAILED",
+                    "errors": [f"Invalid JSON response from agent: {str(e)}"],
+                    "raw_response": response_text[:1000]  # First 1000 chars
+                }
+            
+            # Deep convert ALL numpy/pandas types in the response
             result = self._convert_to_serializable(result)
+            
+            # Extra safety: ensure errors array doesn't contain numpy types
+            if "errors" in result and isinstance(result["errors"], list):
+                result["errors"] = [
+                    str(err) if not isinstance(err, str) else err 
+                    for err in result["errors"]
+                ]
+            
             return result
     
     async def process(

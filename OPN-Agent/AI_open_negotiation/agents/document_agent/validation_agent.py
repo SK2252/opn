@@ -210,12 +210,12 @@ class ValidationAgent(BaseAgent):
             
             # Check for OpenNegGroup or OpenNegNotice values
             if doc_type == DocumentType.OPEN_NEG_GROUP and "OpenNegGroup" in df.columns:
-                valid_records = df["OpenNegGroup"].notna().sum()
+                valid_records = int(df["OpenNegGroup"].notna().sum())
                 result.validated_records = valid_records
                 if valid_records == 0:
                     result.add_error("No valid OpenNegGroup values found")
             elif doc_type == DocumentType.OPEN_NEG_NOTICE and "OpenNegNotice" in df.columns:
-                valid_records = df["OpenNegNotice"].notna().sum()
+                valid_records = int(df["OpenNegNotice"].notna().sum())
                 result.validated_records = valid_records
                 if valid_records == 0:
                     result.add_error("No valid OpenNegNotice values found")

@@ -1,0 +1,54 @@
+{
+  "status": "SUCCESS",
+  "routing_decision": {
+    "type": "routing",
+    "routing": "{\"agent\": \"Open Negotiation AI Agent\", \"subagent\": \"Document Creation Agent\", \"client_name\": \"CEP\", \"wave_number\": \"6\"}",
+    "message": "You've confirmed you're ready to move forward, so I'm going to connect you with our Document Creation Agent who can assist you with creating your document. They'll be happy to help you with the next steps."
+  },
+  "file_resolution": {
+    "excel": "D:\\opn\\yak_tech\\OPN-Agent\\AI_open_negotiation\\Data\\Input\\CEP W6 OPNNEG TEMPLATE.xlsx",
+    "template": "D:\\opn\\yak_tech\\OPN-Agent\\AI_open_negotiation\\Data\\Input\\OpenNeg_CEP_Template.docx"
+  },
+  "execution_result": {
+    "request_id": "orch_CEP_6",
+    "status": "FAILED",
+    "analysis": {
+      "total_rows": 12,
+      "total_columns": 19,
+      "columns": [
+        "S.NO",
+        "CPT_Description",
+        "Claim Number",
+        "ProvOrgNPI",
+        "Date of item(s) or service(s)",
+        "Service code(s)",
+        "Initial Payment",
+        "Offer",
+        "Client NPI",
+        "Provider",
+        "Hospital Name",
+        "InsurancePlanName",
+        "Notice Date",
+        "CMS Date1",
+        "CMS Date2",
+        "insurance_short_name",
+        "provider_short_name",
+        "OpenNegNotice",
+        "OpenNegGroup"
+      ],
+      "unique_providers": 1,
+      "unique_insurance_plans": 4,
+      "group_files_to_generate": 12,
+      "notice_files_to_generate": 4,
+      "null_value_counts": {},
+      "estimated_processing_seconds": 8.0
+    },
+    "validation": null,
+    "processing": null,
+    "insights": null,
+    "errors": [
+      "Object of type int64 is not JSON serializable"
+    ]
+  },
+  "errors": []
+}

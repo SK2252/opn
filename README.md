@@ -32,6 +32,12 @@ Multi-agent document generation system.
 - Creates Word/PDF notice documents
 - Validates data and provides insights
 
+### UI (Port 3000)
+Refined user interface for interacting with the system.
+- React/Vite based frontend
+- Real-time chat interface connected to Orchestrator
+- Customizable themes and settings
+
 ## 🚀 Quick Start
 
 ### 1. Start All Services
@@ -52,6 +58,11 @@ python -m uvicorn app.main:app --host 0.0.0.0 --port 8001
 cd orchestrator
 .\venv\Scripts\Activate.ps1
 uvicorn main:app --host 0.0.0.0 --port 8002
+
+# Terminal 4 - UI
+cd ui
+npm install
+npm run dev
 ```
 
 ### 2. Test the Workflow

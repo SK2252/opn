@@ -7,6 +7,12 @@ AI guidance, validation, and comprehensive statistics.
 
 import asyncio
 import json
+import sys
+# Force flush of prints
+sys.stdout.reconfigure(encoding='utf-8')
+print(f"\n{'='*50}\nMODULE RELOADED: document_plugin.py\n{'='*50}\n")
+import numpy as np
+import pandas as pd
 from typing import Annotated, Any, Dict, Optional
 
 from semantic_kernel import Kernel
@@ -16,6 +22,31 @@ from AI_open_negotiation.agents.document_agent.orchestrator_agent import Orchest
 from AI_open_negotiation.agents.document_agent.validation_agent import ValidationAgent
 from AI_open_negotiation.models.task_models import DocumentTask, DocumentType
 from AI_open_negotiation.models.result_models import ValidationResult
+
+
+
+def _convert_to_native(obj):
+    """Recursively convert numpy types to native Python types."""
+    # Debug trace for potential survivors
+    if "int" in str(type(obj)) or "numpy" in str(type(obj)): print(f"DEBUG: Visiting {type(obj)} {obj}")
+
+    if isinstance(obj, dict):
+        return {_convert_to_native(k): _convert_to_native(v) for k, v in obj.items()}
+    elif isinstance(obj, (list, tuple)):
+        return [_convert_to_native(i) for i in obj]
+    elif isinstance(obj, (np.integer, np.int64, np.int32)):
+        return int(obj)
+    elif isinstance(obj, (np.floating, np.float64, np.float32)):
+        return float(obj)
+    elif isinstance(obj, np.bool_):
+        return bool(obj)
+    elif isinstance(obj, np.ndarray):
+        return obj.tolist()
+    elif hasattr(obj, 'item'):
+        return obj.item()
+    elif pd.isna(obj):
+        return None
+    return obj
 
 
 class AdvancedDocumentPlugin:
@@ -107,7 +138,18 @@ class AdvancedDocumentPlugin:
         result = await self.orchestrator.process_document_request(document_config)
         self._last_result = result
         
-        return json.dumps(result, indent=2, default=str)
+        try:
+            return json.dumps(_convert_to_native(result), indent=2, default=str)
+        except Exception as e:
+            import traceback
+            print(f"\nCRITICAL JSON DUMP ERROR in create_documents: {e}")
+            print(f"Result Type: {type(result)}")
+            traceback.print_exc()
+            # If we fail, try to dump error info at least
+            return json.dumps({
+                "status": "FAILED", 
+                "errors": [f"Serialization Error: {e}"]
+            })
     
     @kernel_function(
         name="validate_data",
@@ -146,13 +188,14 @@ class AdvancedDocumentPlugin:
         result_task = await self.validator.execute(task)
         validation_result = result_task.metadata.get("validation_result", {})
         
-        return json.dumps({
+        return json.dumps(_convert_to_native({
             "is_valid": validation_result.get("is_valid", False),
             "errors": validation_result.get("errors", []),
             "warnings": validation_result.get("warnings", []),
             "total_records": validation_result.get("total_records", 0),
             "validated_records": validation_result.get("validated_records", 0),
-        }, indent=2)
+        }), indent=2)
+
     
     @kernel_function(
         name="get_processing_status",
@@ -168,12 +211,12 @@ class AdvancedDocumentPlugin:
         if self._last_result is None:
             return json.dumps({"status": "no_previous_run", "message": "No processing has been run yet"})
         
-        return json.dumps({
+        return json.dumps(_convert_to_native({
             "status": self._last_result.get("status"),
             "output_folder": self._last_result.get("output_folder"),
             "duration_seconds": self._last_result.get("duration_seconds"),
             "stats": self._last_result.get("stats"),
-        }, indent=2)
+        }), indent=2)
     
     @kernel_function(
         name="analyze_data",
@@ -241,7 +284,7 @@ class AdvancedDocumentPlugin:
             total_files = analysis.get("group_files_to_generate", 0) + analysis.get("notice_files_to_generate", 0)
             analysis["estimated_processing_seconds"] = total_files * 0.5  # Rough estimate
             
-            return json.dumps(analysis, indent=2, default=str)
+            return json.dumps(_convert_to_native(analysis), indent=2, default=str)
             
         except Exception as e:
             return json.dumps({"error": str(e)})

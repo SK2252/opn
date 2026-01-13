@@ -3,7 +3,7 @@
         {
             "agent_name": "Open Negotiation AI Agent",
             "subagent_name": "Document Creation Agent",
-            "endpoint": "http://localhost:8003/run-advanced-workflow",
+            "endpoint": "http://127.0.0.1:8003/run-advanced-workflow",
             "method": "POST",
             "timeout": 300,
             "file_resolution": {
