@@ -15,15 +15,17 @@ def register_agent():
     """Register the Open Negotiation Agent with Repi."""
     
     agent_data = {
-        "name": "Open Negotiation Agent",
-        "description": "Processes Open Negotiation documents including Excel grouping, notice generation, and file organization for healthcare providers. Generates group files, notices, and merged outputs from Excel templates.",
+        "name": "Open Negotiation AI Agent",
+        "description": "AI-powered Open Negotiation document processing system. Handles Excel grouping, notice generation, Word processing, and file organization for healthcare providers. Generates group files, notices, and merged outputs from templates.",
         "capabilities": [
             "document_generation",
+            "document_creation",
             "excel_processing",
             "pdf_creation",
             "word_processing",
             "file_organization",
-            "template_processing"
+            "template_processing",
+            "open_negotiation"
         ]
     }
     

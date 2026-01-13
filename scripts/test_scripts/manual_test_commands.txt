@@ -1,0 +1,63 @@
+# Manual Testing Commands for Orchestrator Workflow
+# =================================================
+# 
+# Run these commands in sequence to test the complete end-to-end workflow.
+# Make sure all 3 services are running first!
+
+# STEP 0: Verify All Services Are Running
+# ----------------------------------------
+curl -s http://localhost:8000/health
+curl -s http://localhost:8001/health  
+curl -s http://localhost:8002/health
+
+# STEP 1: Test Orchestrator - Send Initial Query
+# -----------------------------------------------
+# This sends a query through the orchestrator which routes via Repi to OPN-Agent
+
+curl -X POST http://localhost:8002/process ^
+  -H "Content-Type: application/json" ^
+  -d "{\"query\": \"Create open negotiation document for client CEP wave 6\", 
+  \"session_id\": \"manual_test_001\"}"
+
+# STEP 2: If Repi asks for confirmation, send confirmation
+# ---------------------------------------------------------
+curl -X POST http://localhost:8002/process ^
+  -H "Content-Type: application/json" ^
+  -d "{\"query\": \"Yes, please proceed\", \"session_id\": \"manual_test_001\"}"
+
+# STEP 3: Alternative - Direct OPN-Agent Test (Bypass Orchestrator)
+# ------------------------------------------------------------------
+curl -X POST http://localhost:8000/run-advanced-workflow ^
+  -H "Content-Type: application/json" ^
+  -d "{\"request_id\": \"manual_test_001\", \"excel_path\": \"D:/opn/yak_tech/OPN-Agent/AI_open_negotiation/Data/Input/CEP W6 OPNNEG TEMPLATE.xlsx\", \"template_docx\": \"D:/opn/yak_tech/OPN-Agent/AI_open_negotiation/Data/Input/OpenNeg_CEP_Template.docx\", \"output_folder\": \"D:/opn/yak_tech/OPN-Agent/AI_open_negotiation/Data/Output/Manual_Test\", \"use_ai\": false}"
+
+# STEP 4: Test Repi Directly
+# --------------------------
+curl -X POST "http://localhost:8001/chat/chat?query=Create+document+for+CEP+wave+6"
+
+# =====================
+# SERVICE STARTUP COMMANDS
+# =====================
+# Run each in a separate terminal:
+
+# Terminal 1 - OPN-Agent (Port 8000):
+# cd OPN-Agent; .\venv\Scripts\Activate.ps1; $env:PYTHONPATH="D:\opn\yak_tech\OPN-Agent"; python -m uvicorn main:app --host 0.0.0.0 --port 8000
+
+# Terminal 2 - Repi (Port 8001):
+# cd repi; .\venv\Scripts\Activate.ps1; python -m uvicorn app.main:app --host 0.0.0.0 --port 8001
+
+# Terminal 3 - Orchestrator (Port 8002):
+# cd orchestrator; .\venv\Scripts\Activate.ps1; uvicorn main:app --host 0.0.0.0 --port 8002
+
+# =====================
+# EXPECTED OUTPUT LOCATIONS
+# =====================
+# Documents are generated in:
+# D:\opn\yak_tech\OPN-Agent\AI_open_negotiation\Data\Output\
+
+# =====================
+# TROUBLESHOOTING
+# =====================
+# 1. If port already in use: Get-NetTCPConnection -LocalPort 8000 | Stop-Process -Force
+# 2. If Repi returns 500: Check logs in repi/logs/ for API rate limit errors
+# 3. If OPN-Agent fails: Check that PYTHONPATH is set correctly

@@ -216,15 +216,15 @@ class AdvancedDocumentPlugin:
             
             # Provider analysis
             if 'ProvOrgNPI' in df.columns:
-                analysis["unique_providers"] = df['ProvOrgNPI'].nunique()
+                analysis["unique_providers"] = int(df['ProvOrgNPI'].nunique())
             
             # Insurance plan analysis
             if 'InsurancePlanName' in df.columns:
-                analysis["unique_insurance_plans"] = df['InsurancePlanName'].nunique()
+                analysis["unique_insurance_plans"] = int(df['InsurancePlanName'].nunique())
             
             # Group analysis
             if 'OpenNegGroup' in df.columns:
-                analysis["group_files_to_generate"] = df['OpenNegGroup'].notna().sum()
+                analysis["group_files_to_generate"] = int(df['OpenNegGroup'].notna().sum())
             
             # Notice analysis
             if 'OpenNegNotice' in df.columns:
@@ -235,7 +235,7 @@ class AdvancedDocumentPlugin:
             
             # Data quality
             null_counts = df.isnull().sum().to_dict()
-            analysis["null_value_counts"] = {k: v for k, v in null_counts.items() if v > 0}
+            analysis["null_value_counts"] = {k: int(v) for k, v in null_counts.items() if v > 0}
             
             # Estimate processing time
             total_files = analysis.get("group_files_to_generate", 0) + analysis.get("notice_files_to_generate", 0)

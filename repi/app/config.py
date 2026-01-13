@@ -83,6 +83,8 @@ GROK_API_KEY = os.getenv("GROK_API_KEY")
 if not GROK_API_KEY:
     raise RuntimeError("❌ GROK_API_KEY is missing")
 
+GROK_MODEL = os.getenv("GROK_MODEL", "llama-3.3-70b-versatile")
+
 # =====================
 # QUERY VALIDATION
 # =====================

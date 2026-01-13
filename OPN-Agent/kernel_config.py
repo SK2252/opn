@@ -32,8 +32,8 @@ class SystemConfig:
         enable_parallel: Enable parallel processing
         enable_ai: Enable AI features
     """
-    api_key: str = field(default_factory=lambda: os.getenv("GROQ_API_KEY") or os.getenv("OPENAI_API_KEY", ""))
-    model_id: str = field(default_factory=lambda: os.getenv("AI_MODEL_ID", "gpt-4o-mini"))
+    api_key: str = field(default_factory=lambda: os.getenv("GROK_API_KEY") or os.getenv("GROQ_API_KEY") or os.getenv("OPENAI_API_KEY", ""))
+    model_id: str = field(default_factory=lambda: os.getenv("GROK_MODEL") or os.getenv("AI_MODEL_ID", "gpt-4o-mini"))
     log_level: str = field(default_factory=lambda: os.getenv("LOG_LEVEL", "INFO"))
     max_retries: int = field(default_factory=lambda: int(os.getenv("MAX_RETRIES", "3")))
     timeout: int = field(default_factory=lambda: int(os.getenv("TIMEOUT", "300")))

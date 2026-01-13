@@ -13,10 +13,14 @@ Usage:
 """
 
 import asyncio
+import json
 import os
+import numpy as np
+import pandas as pd
 from typing import Any, Dict, Optional
 
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 from kernel_config import create_kernel, get_config, SystemConfig
@@ -24,6 +28,42 @@ from AI_open_negotiation.plugins.document_plugin import AdvancedDocumentPlugin, 
 from AI_open_negotiation.skills.email_skill import EmailSkill
 from AI_open_negotiation.agents.document_agent.orchestrator_agent import OrchestratorAgent
 from AI_open_negotiation.orchestrators.ai_orchestrator import AIDocumentOrchestrator
+
+
+# Custom JSON encoder for numpy/pandas types
+class NumpyEncoder(json.JSONEncoder):
+    """JSON encoder that handles numpy/pandas types."""
+    def default(self, obj):
+        if isinstance(obj, (np.integer, np.int64, np.int32)):
+            return int(obj)
+        elif isinstance(obj, (np.floating, np.float64, np.float32)):
+            return float(obj)
+        elif isinstance(obj, np.bool_):
+            return bool(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        elif pd.isna(obj):
+            return None
+        return super().default(obj)
+
+
+def convert_numpy_types(obj):
+    """Recursively convert numpy types to Python native types."""
+    if isinstance(obj, dict):
+        return {key: convert_numpy_types(value) for key, value in obj.items()}
+    elif isinstance(obj, list):
+        return [convert_numpy_types(item) for item in obj]
+    elif isinstance(obj, (np.integer, np.int64, np.int32)):
+        return int(obj)
+    elif isinstance(obj, (np.floating, np.float64, np.float32)):
+        return float(obj)
+    elif isinstance(obj, np.bool_):
+        return bool(obj)
+    elif isinstance(obj, np.ndarray):
+        return obj.tolist()
+    elif pd.isna(obj) if hasattr(pd, 'isna') else False:
+        return None
+    return obj
 
 
 # Initialize FastAPI app
@@ -198,6 +238,9 @@ async def run_advanced_workflow(request: DocumentRequest):
             result = await orchestrator.process_document_request(document_config)
         
         print(f"✔ Advanced Workflow COMPLETED | Status: {result.get('status')}")
+        
+        # Convert numpy types to native Python types for JSON serialization
+        result = convert_numpy_types(result)
         
         return {
             "request_id": request.request_id,
