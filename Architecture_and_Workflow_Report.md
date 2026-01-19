@@ -2,72 +2,70 @@
 
 ## 1. System Overview
 
-This document outlines the architecture of the YakTech Open Negotiation (OPN) Automation platform, a microservices-based system designed to automate healthcare document generation workflows using AI agents.
+This document outlines the architecture of the YakTech Open Negotiation (OPN) Automation platform. 
+As of **January 2026**, the system has been consolidated into a **Unified Service Architecture**, moving from a 3-service model to a streamlined 2-service model to enhance scalability and reduce maintenance overhead.
 
 ## 2. High-Level Architecture
 
-The system consists of four primary components:
+The system consists of three primary components:
 1.  **Frontend (UI):** React-based user interface for real-time interaction.
-2.  **Orchestrator:** Middleware service handling coordination and file resolution.
-3.  **Repi (Router):** AI-powered routing engine using RAG and LLMs.
-4.  **OPN-Agent:** Execution engine for document processing.
+2.  **Repi (Unified Brain):** The central core handling Intelligence, Routing, and Orchestration.
+3.  **OPN-Agent (Worker):** Specialized execution engine for document processing.
+
+### Architecture Diagram
 
 ```mermaid
 graph TB
-    User[👤 User / Browser] -->|1. Chat via UI| UI[🖥️ Frontend UI<br/>Port 3000]
-    UI -->|2. Send Query| Orch[🎼 Orchestrator<br/>Port 8002]
+    User[👤 User / Browser] -->|1. Chat/Request| UI[🖥️ Frontend UI<br/>Port 3000]
+    UI -->|2. Send Query| Repi[🧠 Repi Service<br/>(Router + Orchestrator)<br/>Port 8001]
     
-    subgraph Routing Intelligence
-        Orch -->|3. Get Routing| Repi[🧠 Repi Router<br/>Port 8001]
+    subgraph "Repi (The Brain)"
         Repi <-->|Search| Qdrant[(Vector DB)]
         Repi <-->|Query| LLM[Grok LLM]
+        Repi <-->|Lookup| DB[(PostgreSQL)]
     end
     
-    subgraph Execution Intelligence
-        Orch -->|4. Dispatch Command| OPN[⚙️ OPN-Agent<br/>Port 8000]
-        OPN -->|5. Generate| Docs[📄 Docs & Reports]
+    subgraph "Execution Layer"
+        Repi -->|3. Auto-Execute| OPN[⚙️ OPN-Agent<br/>Port 8000]
+        OPN -->|4. Generate| Docs[📄 Docs & Reports]
     end
     
     style UI fill:#3498db,stroke:#2980b9,color:#fff
-    style Orch fill:#9b59b6,stroke:#8e44ad,color:#fff
     style Repi fill:#e67e22,stroke:#d35400,color:#fff
     style OPN fill:#2ecc71,stroke:#27ae60,color:#fff
 ```
 
 ## 3. End-to-End Workflow
 
-The following sequence diagram illustrates the complete lifecycle of a user request, from the initial chat message to the final delivery of generated documents.
+The following sequence diagram illustrates the lifecycle of a request in the unified architecture. The "Orchestrator" is no longer a separate hop; it is an internal logic flow within Repi.
 
 ```mermaid
 sequenceDiagram
     participant U as 👤 User (UI)
-    participant O as 🎼 Orchestrator (8002)
-    participant R as 🧠 Repi Router (8001)
+    participant R as 🧠 Repi (8001)
     participant A as ⚙️ OPN-Agent (8000)
     participant F as 📁 File System
 
     Note over U,F: Step 1: Request Initiation
-    U->>O: POST /process<br/>"Create CEP Wave 6 docs"
+    U->>R: POST /process/process<br/>"Create CEP Wave 6 docs"
     
-    Note over U,F: Step 2: Intelligent Routing
-    O->>R: POST /chat/chat
-    R->>R: Analyze & classify intent
-    R->>R: Extract params (Client=CEP, Wave=6)
-    R-->>O: Return Routing Decision<br/>{agent: OPN, context: {...}}
+    Note over U,F: Step 2: Intelligent Routing (Internal)
+    R->>R: Analyze & Classify Intent (LLM)
+    R->>R: Extract Params (Client=CEP, Wave=6)
+    R->>R: Lookup "Open Negotiation Agent"<br/>in Database to find Endpoint
     
-    Note over U,F: Step 3: Orchestration & File Resolution
-    O->>O: Resolve file paths based on context
-    O->>O: Construct payload for agent
+    Note over U,F: Step 3: Orchestration (Internal)
+    R->>R: Auto-resolve files (Excel, Template)<br/>using matching patterns
+    R->>R: Construct Payload for Agent
     
     Note over U,F: Step 4: Execution
-    O->>A: POST /run-advanced-workflow
+    R->>A: POST /run-advanced-workflow
     A->>A: Run Sub-Agents (Group, Notice, Merge)
-    A->>A: Convert numpy types to native JSON
     A->>F: Read Inputs & Write Outputs
-    A-->>O: Return Results & Stats
+    A-->>R: Return Results & Stats
     
     Note over U,F: Step 5: Completion
-    O-->>U: Final Success Response
+    R-->>U: Final Combined Response
     U->>U: Display "Task Completed"
 ```
 
@@ -75,36 +73,34 @@ sequenceDiagram
 
 ### 🖥️ Frontend UI (Port 3000)
 - **Tech Stack:** React 19, Vite, Tailwind CSS, TypeScript.
-- **Function:** Provides a chat interface for users to naturally interact with agents. Streaming response support.
+- **Function:** Provides a chat interface for users to naturally interact with the system.
 
-### 🎼 Orchestrator Service (Port 8002)
-- **Tech Stack:** Python FastAPI.
-- **Function:** The central nervous system.
-    - **Middleware:** Bridges frontend and backend agents.
-    - **Protocol Resolver:** Translates natural language intent into structured API calls.
-    - **File Resolver:** Smartly mapping "CEP Wave 6" to physical file paths `D:/Data/Input/CEP_W6.xlsx`.
+### 🧠 Repi Service (Port 8001) - *The Unified Brain*
+- **Tech Stack:** Python FastAPI, Supabase (PostgreSQL), Qdrant (Vector DB), Grok LLM, HTTPX.
+- **Roles:**
+    1.  **Router:** Uses RAG + LLM to classify user intent and route to specific agents.
+    2.  **Orchestrator:** Manages the execution flow, resolves dependencies (files), and calls downstream agents.
+    3.  **Registry:** Stores agent configurations (Endpoints, Capabilities) in PostgreSQL.
+- **Key Modules:**
+    - `api/chat.py`: Routing intelligence.
+    - `api/process.py`: Unified entry point.
+    - `services/orchestration_service.py`: Execution logic.
+    - `services/file_resolver.py`: File pattern matching.
 
-### 🧠 Repi Router (Port 8001)
-- **Tech Stack:** Python FastAPI, Supabase (PostgreSQL), Qdrant (Vector DB), Grok LLM.
-- **Function:** Intelligence layer.
-    - **RAG:** Retrieves agent capabilities to match queries.
-    - **LLM Reasoning:** Uses Llama-3 (via Grok) to extract parameters.
-
-### ⚙️ OPN-Agent (Port 8000)
+### ⚙️ OPN-Agent (Port 8000) - *The Worker*
 - **Tech Stack:** Python FastAPI, Semantic Kernel, Pandas.
-- **Function:** Worker layer.
-    - **Multi-Agent:** Coordinator, GroupGenerator, NoticeGenerator.
-    - **Processing:** Handles Excel data manipulation and PDF generation.
+- **Function:** Dedicated worker for heavy-duty document processing.
+    - **Note:** This service is "dumb" - it just executes complex tasks when told by Repi.
+    - **Capabilities:** Excel grouping, Word notice generation, PDF merging.
 
 ## 5. Deployment Specs
 
 | Service | Port | URL | Role |
 |---------|------|-----|------|
 | **UI** | 3000 | `http://localhost:3000` | User Interface |
-| **Orchestrator** | 8002 | `http://localhost:8002` | API Gateway / Middleware |
-| **Repi Router** | 8001 | `http://localhost:8001` | Routing Intelligence |
-| **OPN-Agent** | 8000 | `http://localhost:8000` | Execution Engine |
+| **Repi** | 8001 | `http://localhost:8001` | **Unified Brain** (Routing + API Gateway) |
+| **OPN-Agent** | 8000 | `http://localhost:8000` | Worker / Execution Engine |
 
 ---
 **Generated by Yakkay AI Agent**
-*Document Version: 1.0*
+*Document Version: 2.0 (Consolidated)*
