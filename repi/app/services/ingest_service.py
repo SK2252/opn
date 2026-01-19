@@ -12,7 +12,8 @@ from app.models.agent import Agent
 from app.models.subagent import SubAgent
 
 
-def ingest_agent(name: str, description: str, capabilities: dict = None) -> int:
+def ingest_agent(name: str, description: str, capabilities: dict = None, 
+                 endpoint: str = None, payload_mapping: dict = None, timeout: int = 300) -> int:
     db = SessionLocal()
 
     try:
@@ -23,7 +24,10 @@ def ingest_agent(name: str, description: str, capabilities: dict = None) -> int:
             name=name,
             description=description,
             vector_id=vector_id,
-            capabilities=capabilities or []
+            capabilities=capabilities or [],
+            endpoint=endpoint,  # Store endpoint for orchestration
+            payload_mapping=payload_mapping,  # Store payload mapping
+            timeout=timeout  # Store timeout
         )
 
         db.add(agent)

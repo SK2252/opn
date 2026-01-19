@@ -11,6 +11,9 @@ class AgentRequest(BaseModel):
     name: str
     description: str
     capabilities: Optional[List[str]] = None
+    endpoint: Optional[str] = None  # Agent's API endpoint for execution
+    payload_mapping: Optional[Dict[str, Any]] = None  # Maps routing params to API payload
+    timeout: Optional[int] = 300  # API call timeout in seconds
     
     class Config:
         json_schema_extra = {
@@ -22,7 +25,13 @@ class AgentRequest(BaseModel):
                     "workflow control",
                     "sequential execution",
                     "prerequisite validation"
-                ]
+                ],
+                "endpoint": "http://localhost:8000/run-advanced-workflow",
+                "payload_mapping": {
+                    "request_id": "orch_{client_name}_{wave_number}",
+                    "excel_path": "resolved_excel_path"
+                },
+                "timeout": 300
             }
         }
 
@@ -195,3 +204,53 @@ class InvalidQueryResponse(BaseModel):
             }
         }
 
+
+# =====================
+# PROCESS SCHEMAS (for unified endpoint)
+# =====================
+class ProcessRequest(BaseModel):
+    """Request schema for /process endpoint"""
+    query: str
+    session_id: Optional[str] = None
+    context: Optional[Dict[str, Any]] = None
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "query": "Create documents for CEP Wave 6",
+                "session_id": "user123",
+                "context": {
+                    "base_path": "../OPN-Agent/AI_open_negotiation/Data/Input/"
+                }
+            }
+        }
+
+
+class ProcessResponse(BaseModel):
+    """Response schema for /process endpoint"""
+    status: str
+    routing_decision: Optional[Dict[str, Any]] = None
+    file_resolution: Optional[Dict[str, Any]] = None
+    execution_result: Optional[Dict[str, Any]] = None
+    message: Optional[str] = None
+    errors: Optional[List[str]] = None
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "status": "SUCCESS",
+                "routing_decision": {
+                    "agent": "Open Negotiation AI Agent",
+                    "client_name": "CEP",
+                    "wave_number": "W6"
+                },
+                "file_resolution": {
+                    "excel": "../Data/Input/CEP W6.xlsx",
+                    "template": "../Data/Input/Template.docx"
+                },
+                "execution_result": {
+                    "status": "success",
+                    "output_files": ["CEP_W6_GROUP.xlsx"]
+                }
+            }
+        }

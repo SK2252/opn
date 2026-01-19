@@ -1,173 +1,108 @@
-# YakTech OPN Monorepo
+# YakTech OPN Monorepo (Unified v2.0)
 
-A comprehensive Open Negotiation document automation platform consisting of three integrated services.
+A comprehensive Open Negotiation document automation platform with unified routing and execution.
 
 ## 🏗️ Architecture
 
 ```
-┌─────────────┐     ┌──────────────┐     ┌─────────────┐
-│    Repi     │────▶│ Orchestrator │────▶│  OPN-Agent  │
-│  (Router)   │     │ (Middleware) │     │ (Generator) │
-│  Port 8001  │     │  Port 8002   │     │  Port 8000  │
-└─────────────┘     └──────────────┘     └─────────────┘
+┌─────────────────────────────────┐      ┌─────────────┐ 
+│            Repi                 │      │  OPN-Agent  │
+│ (Router + Orchestrator + API)   │─────▶│ (Generator) │
+│           Port 8001             │      │  Port 8000  │
+└─────────────────────────────────┘      └─────────────┘
 ```
 
 ## 📦 Services
 
-### Repi (Port 8001)
-AI-powered routing agent using RAG for intelligent query classification.
-- Routes queries to appropriate agents/subagents
-- Extracts client name, wave number from natural language
-- Uses Grok API for LLM capabilities
+### Repi (Port 8001) - **Unified Brain**
+Combines AI routing and orchestration into a single service.
+- **Intelligent Routing:** Classifies query using RAG + Grok LLM
+- **Orchestration:** Automatically executes downstream agents
+- **File Resolution:** Auto-discovers files based on patterns
+- **Agent Registry:** Stores capabilities and endpoints in database
 
-### Orchestrator (Port 8002)
-Middleware service coordinating Repi and OPN-Agent.
-- Single API endpoint for end-to-end workflows
-- Smart file resolution based on client/wave parameters
-- Agent registry configuration
-
-### OPN-Agent (Port 8000)
-Multi-agent document generation system.
+### OPN-Agent (Port 8000) - **Specialized Worker**
+Dedicated document factory.
 - Generates Open Negotiation Excel group files
 - Creates Word/PDF notice documents
 - Validates data and provides insights
 
 ### UI (Port 3000)
-Refined user interface for interacting with the system.
+User interface.
 - React/Vite based frontend
-- Real-time chat interface connected to Orchestrator
-- Customizable themes and settings
+- Connects to Repi (Port 8001)
 
 ## 🚀 Quick Start
 
-### 1. Start All Services
+### 1. Start Services
 
 ```powershell
-# Terminal 1 - OPN-Agent
+# Terminal 1 - OPN-Agent (The Worker)
 cd OPN-Agent
-.\venv\Scripts\Activate.ps1
-$env:PYTHONPATH="D:\opn\yak_tech\OPN-Agent"
 python -m uvicorn main:app --host 0.0.0.0 --port 8000
 
-# Terminal 2 - Repi
+# Terminal 2 - Repi (The Brain)
 cd repi
-.\venv\Scripts\Activate.ps1
 python -m uvicorn app.main:app --host 0.0.0.0 --port 8001
-
-# Terminal 3 - Orchestrator
-cd orchestrator
-.\venv\Scripts\Activate.ps1
-uvicorn main:app --host 0.0.0.0 --port 8002
-
-# Terminal 4 - UI
-cd ui
-npm install
-npm run dev
 ```
 
-### 2. Test the Workflow
+### 2. Run Automation
+
+You can now trigger the entire workflow via Repi's unified endpoint:
 
 ```bash
-# Via Orchestrator (recommended)
-curl -X POST http://localhost:8002/process \
-  -H "Content-Type: application/json" \
-  -d '{"query": "Create document for client CEP wave 6", "session_id": "test"}'
-
-# Direct OPN-Agent call
-curl -X POST http://localhost:8000/run-advanced-workflow \
+curl -X POST http://localhost:8001/process/process \
   -H "Content-Type: application/json" \
   -d '{
-    "request_id": "test",
-    "excel_path": "path/to/input.xlsx",
-    "template_docx": "path/to/template.docx",
-    "output_folder": "path/to/output",
-    "use_ai": false
+    "query": "Create document for CEP Wave 6" 
   }'
 ```
+
+**What happens:**
+1. Repi analyzes query -> Routes to "Open Negotiation Agent"
+2. Repi finds agent endpoint (http://localhost:8000...) from DB
+3. Repi auto-resolves files (Excel, Templates)
+4. Repi calls OPN-Agent -> Returns combined result
 
 ## 📁 Project Structure
 
 ```
 yak_tech/
 ├── OPN-Agent/                 # Document generation service
-│   ├── AI_open_negotiation/   # Core agent logic
-│   │   ├── agents/            # Document agents
-│   │   ├── models/            # Result models
-│   │   ├── plugins/           # SK plugins
-│   │   └── Data/              # Input/Output folders
-│   └── main.py                # FastAPI app
+│   └── ...
 │
-├── repi/                      # Routing service
+├── repi/                      # Unified Routing & Orchestration
 │   ├── app/
-│   │   ├── main.py            # FastAPI app
-│   │   ├── rag/               # RAG components
-│   │   └── config.py          # Configuration
-│   └── .env                   # Environment variables
-│
-├── orchestrator/              # Middleware service
-│   ├── main.py                # FastAPI app
-│   ├── orchestrator.py        # Core logic
-│   ├── file_resolver.py       # Smart file resolution
-│   └── agent_registry.json    # Agent configuration
+│   │   ├── api/
+│   │   │   ├── process.py     # ✅ Unified Endpoint
+│   │   │   ├── chat.py        # Routing Logic
+│   │   │   └── ingest.py      # Agent Registration
+│   │   ├── services/
+│   │   │   ├── orchestration_service.py  # ✅ Core Logic
+│   │   │   ├── file_resolver.py          # ✅ File Discovery
+│   │   │   └── ...
+│   └── .env
 │
 └── scripts/                   # Utility scripts
-    ├── register_*.py          # Agent registration
-    └── test_scripts/          # Test files
 ```
 
-## ⚙️ Configuration
+## ⚙️ Adding New Agents (Infinite Scaling)
 
-### Environment Variables
-
-**Repi (.env)**
-```
-GROK_API_KEY=your_grok_api_key
-SUPABASE_URL=your_supabase_url
-SUPABASE_KEY=your_supabase_key
-```
-
-**Orchestrator (.env)**
-```
-REPI_URL=http://localhost:8001
-OPN_AGENT_URL=http://localhost:8000
-ORCHESTRATOR_PORT=8002
-```
-
-### Agent Registry (orchestrator/agent_registry.json)
-Configure agent endpoints, file patterns, and payload mappings.
-
-## 📄 Generated Documents
-
-For a typical CEP Wave 6 request, the system generates:
-- 4 Group Excel files (per insurance plan)
-- 4 Notice Word documents
-- 4 Notice PDF files
-
-Output location: `OPN-Agent/AI_open_negotiation/Data/Output/{client}_W{wave}/`
-
-## 🛠️ Development
-
-### Install Dependencies
+To add a new agent, simply register it via API with an `endpoint`:
 
 ```bash
-# OPN-Agent
-cd OPN-Agent && pip install -r requirements.txt
-
-# Repi
-cd repi && pip install -r requirements.txt
-
-# Orchestrator
-cd orchestrator && pip install -r requirements.txt
+curl -X POST http://localhost:8001/ingest/agent \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Email Agent",
+    "description": "Sends emails to clients",
+    "capabilities": ["email_sending"],
+    "endpoint": "http://localhost:8003/send-email",
+    "payload_mapping": {
+      "to": "{client_email}",
+      "subject": "Notice for {client_name}"
+    }
+  }'
 ```
 
-### Run Tests
-
-```bash
-cd scripts/test_scripts
-python test_complete_workflow.py
-python test_opn_direct.py
-```
-
-## 📝 License
-
-Proprietary - YakTech Industries
+The system will now automatically route relevant queries to this new agent!

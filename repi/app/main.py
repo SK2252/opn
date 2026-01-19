@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from app.api import ingest, retrieve, chat
+from app.api import ingest, retrieve, chat, process
 from app.db.qdrant import init_qdrant
 from app.db.database import init_db
 
@@ -13,6 +13,7 @@ init_qdrant()
 app.include_router(ingest.router, prefix="/ingest")
 app.include_router(retrieve.router, prefix="/search")
 app.include_router(chat.router, prefix="/chat")
+app.include_router(process.router, prefix="/process")  # Unified API
 
 
 @app.get("/health")

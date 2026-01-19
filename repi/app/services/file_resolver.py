@@ -1,6 +1,7 @@
 """
 File resolution module for auto-discovering input files based on patterns.
 Uses glob matching to find Excel templates and Word templates.
+Migrated from orchestrator service into Repi.
 """
 
 import glob

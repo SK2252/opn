@@ -1,0 +1,61 @@
+CONSOLIDATION CHANGELOG - SERVICE MERGE (Orchestrator -> Repi)
+================================================================
+
+1. Database Upgrade
+-------------------
+File: repi/app/models/agent.py
+- Added `endpoint` column (String): Stores the target agent's API URL.
+- Added `payload_mapping` column (JSON): Defines how to map routing parameters to the agent's API payload.
+- Added `timeout` column (Integer): Defines the timeout for the agent API call (default 300s).
+
+2. API Schema Update
+--------------------
+File: repi/app/schemas.py
+- Updated `AgentRequest`: Added optional fields `endpoint`, `payload_mapping`, and `timeout` for registration.
+- Added `ProcessRequest`: Schema for the new unified `/process` endpoint.
+- Added `ProcessResponse`: Schema for the combined routing and execution response.
+
+3. Ingestion Service Upgrade
+----------------------------
+File: repi/app/services/ingest_service.py
+- Updated `ingest_agent` function to accept and store the new orchestration fields (endpoint, etc.) in the database.
+File: repi/app/api/ingest.py
+- Updated `/ingest/agent` endpoint to pass these new fields from the request to the service.
+
+4. File Resolver Migration
+--------------------------
+File: repi/app/services/file_resolver.py (NEW)
+- Migrated the `FileResolver` class from the deleted orchestrator service.
+- Functionality: Auto-discovers input files (Excel, Templates) based on client/wave patterns.
+
+5. Orchestration Logic Migration
+--------------------------------
+File: repi/app/services/orchestration_service.py (NEW)
+- Implemented the core orchestration logic here.
+- Function `process_query`:
+  1. Receives routing result.
+  2. Resolves file paths.
+  3. Builds agent payload.
+  4. Executes the agent endpoint via HTTP request.
+
+6. New Unified Endpoint
+-----------------------
+File: repi/app/api/process.py (NEW)
+- Created the `/process` router.
+- Combines `chat()` (from the routing engine) and `process_query()` (from orchestration service) into a single API call.
+- This effectively replaces the standalone Orchestrator service.
+
+7. Main App Integration
+-----------------------
+File: repi/app/main.py
+- Imported the new `process` router.
+- Registered it with `app.include_router(process.router, prefix="/process")`.
+
+8. Dependency Updates
+---------------------
+File: repi/requirements.txt
+- Added `httpx` to support asynchronous HTTP calls to downstream agents.
+
+9. Cleanup
+----------
+- DELETED `orchestrator` folder entirely. The architecture is now consolidated into two services: Repi (Brain) and OPN-Agent (Worker).

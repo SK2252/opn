@@ -18,15 +18,26 @@ def add_agent(request: AgentRequest):
     - Stored in MySQL with metadata and capabilities
     - Embedded and indexed in Qdrant vector database
     - Available for routing and inquiry
+    - Optionally executable via orchestration (if endpoint provided)
     
     **Request Body:**
     - `name`: Unique name of the agent
     - `description`: What the agent does
     - `capabilities`: Optional list of capability strings (e.g., ["orchestration", "validation"])
+    - `endpoint`: Optional API endpoint for agent execution
+    - `payload_mapping`: Optional mapping of routing params to API payload
+    - `timeout`: Optional API call timeout in seconds (default: 300)
     
     **Returns:** Agent ID of the created agent
     """
-    return {"agent_id": ingest_agent(request.name, request.description, request.capabilities)}
+    return {"agent_id": ingest_agent(
+        request.name, 
+        request.description, 
+        request.capabilities,
+        request.endpoint,
+        request.payload_mapping,
+        request.timeout
+    )}
 
 
 @router.post(

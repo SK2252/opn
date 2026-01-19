@@ -10,3 +10,4 @@ sqlalchemy
 requests
 
 python-dotenv
+httpx
