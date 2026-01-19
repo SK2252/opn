@@ -16,17 +16,20 @@ def register_agent():
     
     agent_data = {
         "name": "Open Negotiation AI Agent",
-        "description": "AI-powered Open Negotiation document processing system. Handles Excel grouping, notice generation, Word processing, and file organization for healthcare providers. Generates group files, notices, and merged outputs from templates.",
+        "description": "AI-powered Open Negotiation document processing system...",
         "capabilities": [
             "document_generation",
-            "document_creation",
-            "excel_processing",
-            "pdf_creation",
-            "word_processing",
-            "file_organization",
-            "template_processing",
-            "open_negotiation"
-        ]
+            "orchestration"
+        ],
+        "endpoint": "http://localhost:8000/run-advanced-workflow",
+        "payload_mapping": {
+            "request_id": "orch_{client_name}_{wave_number}",
+            "excel_path": "resolved_excel_path",
+            "template_docx": "resolved_template_path",
+            "output_folder": "AI_open_negotiation/Data/Output/{client_name}_W{wave_number}",
+            "use_ai": True,
+            "user_instructions": "Auto-triggered from Repi: Client {client_name}, Wave {wave_number}"
+        }
     }
     
     print("=" * 60)
@@ -34,7 +37,6 @@ def register_agent():
     print("=" * 60)
     print(f"\n📍 Endpoint: {REPI_URL}/ingest/agent")
     print(f"📝 Agent: {agent_data['name']}")
-    print(f"📋 Capabilities: {', '.join(agent_data['capabilities'])}")
     
     try:
         response = requests.post(
