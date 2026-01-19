@@ -1,18 +1,18 @@
 """
-Register OPN-Agent with Repi Router
+Register OPN-Agent with Repo Router
 
-This script registers the Open Negotiation Agent with the Repi routing system
+This script registers the Open Negotiation Agent with the Repo routing system
 so it can be discovered and routed to by user queries.
 """
 
 import requests
 import json
 
-# Repi router endpoint
-REPI_URL = "http://localhost:8001"
+# Repo router endpoint
+REPO_URL = "http://localhost:8001"
 
 def register_agent():
-    """Register the Open Negotiation Agent with Repi."""
+    """Register the Open Negotiation Agent with Repo."""
     
     agent_data = {
         "name": "Open Negotiation AI Agent",
@@ -28,19 +28,19 @@ def register_agent():
             "template_docx": "resolved_template_path",
             "output_folder": "AI_open_negotiation/Data/Output/{client_name}_W{wave_number}",
             "use_ai": True,
-            "user_instructions": "Auto-triggered from Repi: Client {client_name}, Wave {wave_number}"
+            "user_instructions": "Auto-triggered from Repo: Client {client_name}, Wave {wave_number}"
         }
     }
     
     print("=" * 60)
-    print("🔗 Registering OPN-Agent with Repi Router")
+    print("🔗 Registering OPN-Agent with Repo Router")
     print("=" * 60)
-    print(f"\n📍 Endpoint: {REPI_URL}/ingest/agent")
+    print(f"\n📍 Endpoint: {REPO_URL}/ingest/agent")
     print(f"📝 Agent: {agent_data['name']}")
     
     try:
         response = requests.post(
-            f"{REPI_URL}/ingest/agent",
+            f"{REPO_URL}/ingest/agent",
             json=agent_data,
             headers={"Content-Type": "application/json"}
         )
@@ -58,8 +58,8 @@ def register_agent():
             return False
             
     except requests.exceptions.ConnectionError:
-        print(f"\n❌ ERROR: Cannot connect to Repi at {REPI_URL}")
-        print("   Make sure Repi is running on port 8001")
+        print(f"\n❌ ERROR: Cannot connect to Repo at {REPO_URL}")
+        print("   Make sure Repo is running on port 8001")
         return False
     except Exception as e:
         print(f"\n❌ ERROR: {str(e)}")
@@ -77,7 +77,7 @@ def test_routing():
     
     try:
         response = requests.post(
-            f"{REPI_URL}/chat/chat",
+            f"{REPO_URL}/chat/chat",
             params={"query": query},
             headers={"Content-Type": "application/json"}
         )

@@ -1,11 +1,11 @@
 """
-Complete OPN-Agent Registration with Repi Router
+Complete OPN-Agent Registration with Repo Router
 Registers both the main agent and the Document Creation subagent
 """
 import requests
 import json
 
-REPI_URL = "http://localhost:8001"
+REPO_URL = "http://localhost:8001"
 
 def register_main_agent():
     """Register the main Open Negotiation AI Agent."""

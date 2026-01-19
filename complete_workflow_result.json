@@ -3,15 +3,15 @@
   "routing_decision": {
     "type": "routing",
     "routing": "{\"agent\": \"Open Negotiation AI Agent\", \"subagent\": \"Document Creation Agent\", \"client_name\": \"CEP\", \"wave_number\": \"6\"}",
-    "message": "You've confirmed you're ready to move forward, so I'm going to connect you with our Document Creation Agent who can assist you with creating your document. They'll be happy to help you with the next steps."
+    "message": "I've got you covered, I'm sending you over to our Document Creation Agent who'll help you get started with creating your document. They'll take care of you from here and make sure everything goes smoothly."
   },
   "file_resolution": {
-    "excel": "D:\\opn\\yak_tech\\OPN-Agent\\AI_open_negotiation\\Data\\Input\\CEP W6 OPNNEG TEMPLATE.xlsx",
-    "template": "D:\\opn\\yak_tech\\OPN-Agent\\AI_open_negotiation\\Data\\Input\\OpenNeg_CEP_Template.docx"
+    "excel": "D:\\yak_tech\\opn\\OPN-Agent\\AI_open_negotiation\\Data\\Input\\CEP W6 OPNNEG TEMPLATE.xlsx",
+    "template": "D:\\yak_tech\\opn\\OPN-Agent\\AI_open_negotiation\\Data\\Input\\OpenNeg_CEP_Template.docx"
   },
   "execution_result": {
     "request_id": "orch_CEP_6",
-    "status": "FAILED",
+    "status": "SUCCESS",
     "analysis": {
       "total_rows": 12,
       "total_columns": 19,
@@ -43,12 +43,46 @@
       "null_value_counts": {},
       "estimated_processing_seconds": 8.0
     },
-    "validation": null,
-    "processing": null,
+    "validation": {
+      "is_valid": true,
+      "errors": [],
+      "warnings": [
+        "Missing template placeholders: ['{Provider}']"
+      ],
+      "total_records": 12,
+      "validated_records": 12
+    },
+    "processing": {
+      "status": "SUCCESS",
+      "output_folder": "AI_open_negotiation/Data/Output/CEP_W6/merged",
+      "duration_seconds": 18.86,
+      "errors": [],
+      "warnings": [
+        "Missing template placeholders: ['{Provider}']"
+      ],
+      "stats": {
+        "total_records": 8,
+        "successful": 8,
+        "failed": 0,
+        "skipped": 0,
+        "success_rate": 100.0,
+        "duration_seconds": 18.81,
+        "output_files_count": 0,
+        "errors": []
+      },
+      "validation": {
+        "is_valid": true,
+        "errors": [],
+        "warnings": [
+          "Missing template placeholders: ['{Provider}']"
+        ],
+        "validated_records": 12,
+        "total_records": 12
+      }
+    },
     "insights": null,
-    "errors": [
-      "Object of type int64 is not JSON serializable"
-    ]
+    "errors": []
   },
+  "message": null,
   "errors": []
 }

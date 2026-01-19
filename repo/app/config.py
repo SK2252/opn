@@ -53,7 +53,8 @@
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
+# Load environment variables from .env file (Centralized in opn/)
+load_dotenv(os.path.join(os.path.dirname(__file__), "../../.env"))
 
 # =====================
 # DATABASE (Supabase PostgreSQL)

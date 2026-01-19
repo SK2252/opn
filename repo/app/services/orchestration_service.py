@@ -1,6 +1,6 @@
 """
 Orchestration service - handles unified routing + execution.
-Migrated from standalone orchestrator service into Repi.
+Migrated from standalone orchestrator service into Repo.
 """
 
 import json
@@ -90,10 +90,17 @@ async def process_query(
         # Resolve files if payload_mapping includes file paths
         resolved_files = {}
         if agent.payload_mapping:
+            logger.info(f"[ORCHESTRATION] Agent has payload_mapping: {agent.payload_mapping}")
             base_path = context.get("base_path") if context else None
+            logger.info(f"[ORCHESTRATION] Base path from context: {base_path}")
             if base_path:
                 resolved_files = _resolve_files(agent, params, base_path)
+                logger.info(f"[ORCHESTRATION] Resolved files: {resolved_files}")
                 result["file_resolution"] = resolved_files
+            else:
+                logger.warning("[ORCHESTRATION] No base_path in context, skipping file resolution")
+        else:
+            logger.info("[ORCHESTRATION] Agent has no payload_mapping")
         
         # Build agent payload
         payload = _build_payload(agent, params, resolved_files)
@@ -143,7 +150,8 @@ def _resolve_files(
         if not agent.payload_mapping:
             return {}
         
-        # Extract file patterns from payload mappingpatterns = {}
+        # Extract file patterns from payload mapping
+        patterns = {}
         for key, value in agent.payload_mapping.items():
             if isinstance(value, str) and "resolved_" in value:
                 # This is a file reference like "resolved_excel_path"
@@ -155,7 +163,12 @@ def _resolve_files(
                 elif file_type == "template":
                     patterns["template"] = "*Template*.docx"
         
+        logger.info(f"[FILE_RESOLUTION] Patterns extracted: {patterns}")
+        logger.info(f"[FILE_RESOLUTION] Params: {params}")
+        logger.info(f"[FILE_RESOLUTION] Base path: {base_path}")
+        
         if not patterns:
+            logger.warning("[FILE_RESOLUTION] No patterns found in payload_mapping")
             return {}
         
         resolver = FileResolver(base_path)
@@ -164,6 +177,8 @@ def _resolve_files(
             wave_number=params.get("wave_number", ""),
             patterns=patterns
         )
+        
+        logger.info(f"[FILE_RESOLUTION] Resolved files: {resolved}")
         
         return resolved
     

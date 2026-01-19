@@ -4,7 +4,7 @@ from app.api import ingest, retrieve, chat, process
 from app.db.qdrant import init_qdrant
 from app.db.database import init_db
 
-app = FastAPI(title="RAG Agent Router")
+app = FastAPI(title="Repo Service")
 
 # ✅ AUTO INIT
 init_db()

@@ -1,0 +1,37 @@
+# Centralized Requirements for YakTech OPN
+
+# Core Framework
+fastapi>=0.100.0
+uvicorn>=0.22.0
+pydantic>=2.0.0
+python-dotenv>=1.0.0
+httpx>=0.24.0
+requests
+aiohttp>=3.8.0
+
+# Database & Vector Store
+psycopg2-binary
+sqlalchemy
+qdrant-client
+
+# AI & LLM
+semantic-kernel>=1.0.0
+groq>=0.4.0
+nomic
+sentence-transformers
+einops
+
+# Data Processing
+pandas>=2.0.0
+openpyxl>=3.1.0
+xlrd>=2.0.0
+
+# Document Processing
+python-docx>=1.0.0
+docx2pdf>=0.1.8
+
+# Windows Integration
+pywin32>=306
+
+# Utilities
+colorama>=0.4.6

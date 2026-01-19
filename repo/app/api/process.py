@@ -20,7 +20,7 @@ async def process(request: ProcessRequest):
     """
     Unified Endpoint: Routing + Execution
     
-    1. Calls Repi routing engine (same as /chat)
+    1. Calls Repo routing engine (same as /chat)
     2. If routing is successful, automatically executes the target agent
     3. Returns combined result
     
@@ -43,12 +43,22 @@ async def process(request: ProcessRequest):
     
     logger.info(f"[PROCESS] Routing result type: {routing_result.get('type')}")
     
+    # Inject default base_path for file resolution if not provided
+    context = request.context or {}
+    if "base_path" not in context:
+        # Default to OPN-Agent's input folder (relative to repo/app/api)
+        import os
+        context["base_path"] = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "../../../OPN-Agent/AI_open_negotiation/Data/Input")
+        )
+        logger.info(f"[PROCESS] Using default base_path: {context['base_path']}")
+    
     # Step 2: Orchestrate execution based on routing
     result = await process_query(
         query=request.query,
         routing_result=routing_result,
         session_id=request.session_id,
-        context=request.context
+        context=context
     )
     
     logger.info(f"[PROCESS] Completed with status: {result['status']}")

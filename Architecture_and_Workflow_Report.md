@@ -9,7 +9,7 @@ As of **January 2026**, the system has been consolidated into a **Unified Servic
 
 The system consists of three primary components:
 1.  **Frontend (UI):** React-based user interface for real-time interaction.
-2.  **Repi (Unified Brain):** The central core handling Intelligence, Routing, and Orchestration.
+2.  **Repo (Unified Brain):** The central core handling Intelligence, Routing, and Orchestration.
 3.  **OPN-Agent (Worker):** Specialized execution engine for document processing.
 
 ### Architecture Diagram
@@ -17,32 +17,32 @@ The system consists of three primary components:
 ```mermaid
 graph TB
     User[👤 User / Browser] -->|1. Chat/Request| UI[🖥️ Frontend UI<br/>Port 3000]
-    UI -->|2. Send Query| Repi[🧠 Repi Service<br/>(Router + Orchestrator)<br/>Port 8001]
+    UI -->|2. Send Query| Repo[🧠 Repo Service<br/>(Router + Orchestrator)<br/>Port 8001]
     
-    subgraph "Repi (The Brain)"
-        Repi <-->|Search| Qdrant[(Vector DB)]
-        Repi <-->|Query| LLM[Grok LLM]
-        Repi <-->|Lookup| DB[(PostgreSQL)]
+    subgraph "Repo (The Brain)"
+        Repo <-->|Search| Qdrant[(Vector DB)]
+        Repo <-->|Query| LLM[Grok LLM]
+        Repo <-->|Lookup| DB[(PostgreSQL)]
     end
     
     subgraph "Execution Layer"
-        Repi -->|3. Auto-Execute| OPN[⚙️ OPN-Agent<br/>Port 8000]
+        Repo -->|3. Auto-Execute| OPN[⚙️ OPN-Agent<br/>Port 8000]
         OPN -->|4. Generate| Docs[📄 Docs & Reports]
     end
     
     style UI fill:#3498db,stroke:#2980b9,color:#fff
-    style Repi fill:#e67e22,stroke:#d35400,color:#fff
+    style Repo fill:#e67e22,stroke:#d35400,color:#fff
     style OPN fill:#2ecc71,stroke:#27ae60,color:#fff
 ```
 
 ## 3. End-to-End Workflow
 
-The following sequence diagram illustrates the lifecycle of a request in the unified architecture. The "Orchestrator" is no longer a separate hop; it is an internal logic flow within Repi.
+The following sequence diagram illustrates the lifecycle of a request in the unified architecture. The "Orchestrator" is no longer a separate hop; it is an internal logic flow within Repo.
 
 ```mermaid
 sequenceDiagram
     participant U as 👤 User (UI)
-    participant R as 🧠 Repi (8001)
+    participant R as 🧠 Repo (8001)
     participant A as ⚙️ OPN-Agent (8000)
     participant F as 📁 File System
 
@@ -75,7 +75,7 @@ sequenceDiagram
 - **Tech Stack:** React 19, Vite, Tailwind CSS, TypeScript.
 - **Function:** Provides a chat interface for users to naturally interact with the system.
 
-### 🧠 Repi Service (Port 8001) - *The Unified Brain*
+### 🧠 Repo Service (Port 8001) - *The Unified Brain*
 - **Tech Stack:** Python FastAPI, Supabase (PostgreSQL), Qdrant (Vector DB), Grok LLM, HTTPX.
 - **Roles:**
     1.  **Router:** Uses RAG + LLM to classify user intent and route to specific agents.
@@ -90,7 +90,7 @@ sequenceDiagram
 ### ⚙️ OPN-Agent (Port 8000) - *The Worker*
 - **Tech Stack:** Python FastAPI, Semantic Kernel, Pandas.
 - **Function:** Dedicated worker for heavy-duty document processing.
-    - **Note:** This service is "dumb" - it just executes complex tasks when told by Repi.
+    - **Note:** This service is "dumb" - it just executes complex tasks when told by Repo.
     - **Capabilities:** Excel grouping, Word notice generation, PDF merging.
 
 ## 5. Deployment Specs
@@ -98,7 +98,7 @@ sequenceDiagram
 | Service | Port | URL | Role |
 |---------|------|-----|------|
 | **UI** | 3000 | `http://localhost:3000` | User Interface |
-| **Repi** | 8001 | `http://localhost:8001` | **Unified Brain** (Routing + API Gateway) |
+| **Repo** | 8001 | `http://localhost:8001` | **Unified Brain** (Routing + API Gateway) |
 | **OPN-Agent** | 8000 | `http://localhost:8000` | Worker / Execution Engine |
 
 ---

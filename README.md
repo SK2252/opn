@@ -6,7 +6,7 @@ A comprehensive Open Negotiation document automation platform with unified routi
 
 ```
 ┌─────────────────────────────────┐      ┌─────────────┐ 
-│            Repi                 │      │  OPN-Agent  │
+│            Repo                 │      │  OPN-Agent  │
 │ (Router + Orchestrator + API)   │─────▶│ (Generator) │
 │           Port 8001             │      │  Port 8000  │
 └─────────────────────────────────┘      └─────────────┘
@@ -14,7 +14,7 @@ A comprehensive Open Negotiation document automation platform with unified routi
 
 ## 📦 Services
 
-### Repi (Port 8001) - **Unified Brain**
+### Repo (Port 8001) - **Unified Brain**
 Combines AI routing and orchestration into a single service.
 - **Intelligent Routing:** Classifies query using RAG + Grok LLM
 - **Orchestration:** Automatically executes downstream agents
@@ -30,7 +30,7 @@ Dedicated document factory.
 ### UI (Port 3000)
 User interface.
 - React/Vite based frontend
-- Connects to Repi (Port 8001)
+- Connects to Repo (Port 8001)
 
 ## 🚀 Quick Start
 
@@ -41,14 +41,14 @@ User interface.
 cd OPN-Agent
 python -m uvicorn main:app --host 0.0.0.0 --port 8000
 
-# Terminal 2 - Repi (The Brain)
-cd repi
+# Terminal 2 - Repo (The Brain)
+cd repo
 python -m uvicorn app.main:app --host 0.0.0.0 --port 8001
 ```
 
 ### 2. Run Automation
 
-You can now trigger the entire workflow via Repi's unified endpoint:
+You can now trigger the entire workflow via Repo's unified endpoint:
 
 ```bash
 curl -X POST http://localhost:8001/process/process \
@@ -59,10 +59,10 @@ curl -X POST http://localhost:8001/process/process \
 ```
 
 **What happens:**
-1. Repi analyzes query -> Routes to "Open Negotiation Agent"
-2. Repi finds agent endpoint (http://localhost:8000...) from DB
-3. Repi auto-resolves files (Excel, Templates)
-4. Repi calls OPN-Agent -> Returns combined result
+1. Repo analyzes query -> Routes to "Open Negotiation Agent"
+2. Repo finds agent endpoint (http://localhost:8000...) from DB
+3. Repo auto-resolves files (Excel, Templates)
+4. Repo calls OPN-Agent -> Returns combined result
 
 ## 📁 Project Structure
 
@@ -71,7 +71,7 @@ yak_tech/
 ├── OPN-Agent/                 # Document generation service
 │   └── ...
 │
-├── repi/                      # Unified Routing & Orchestration
+├── repo/                      # Unified Routing & Orchestration
 │   ├── app/
 │   │   ├── api/
 │   │   │   ├── process.py     # ✅ Unified Endpoint

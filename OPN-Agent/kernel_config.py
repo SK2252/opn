@@ -15,7 +15,8 @@ from semantic_kernel.connectors.ai.function_choice_behavior import FunctionChoic
 from dotenv import load_dotenv
 
 # Load environment variables
-load_dotenv()
+# Load environment variables (Centralized in opn/)
+load_dotenv(os.path.join(os.path.dirname(__file__), "../.env"))
 
 
 @dataclass

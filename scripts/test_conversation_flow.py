@@ -1,17 +1,17 @@
 """
-Test multi-turn conversation flow with Repi
+Test multi-turn conversation flow with Repo
 """
 
 import requests
 import json
 
-REPI_URL = "http://localhost:8001"
+REPO_URL = "http://localhost:8001"
 SESSION_ID = "test_session_123"
 
 def send_query(query, session_id=SESSION_ID):
-    """Send a query to Repi and get response."""
+    """Send a query to Repo and get response."""
     response = requests.post(
-        f"{REPI_URL}/chat/chat",
+        f"{REPO_URL}/chat/chat",
         params={"query": query, "session_id": session_id}
     )
     return response.json()

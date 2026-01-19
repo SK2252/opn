@@ -7,7 +7,7 @@ import json
 import time
 
 def call_orchestrator(query, session_id):
-    """Call Repi Unified Process"""
+    """Call Repo Unified Process"""
     with httpx.Client(timeout=300.0) as client:
         response = client.post(
             "http://localhost:8001/process/process",
